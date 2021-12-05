@@ -59,45 +59,28 @@ func (d *Diagram) drawLine(origin Point, destination Point, drawDiagonals bool) 
 		degreeIsCorrect, angleInDegrees := d.diagonalAngle(origin, destination)
 		// We only want points that are at 45, -45, 135 or -135 degrees.
 		if degreeIsCorrect {
+			// Since we are moving in 45-degrees, the distance on X and Y axis grow equally.  Because of this we can use
+			// the absolute distance between X or Y coordinate to know the distance between our points.
+			distance := int(math.Abs(float64(origin.x - destination.x)))
+			var signX, signY int
 			switch angleInDegrees {
 			case -45:
 				// To move at a -45-degree angleInDegrees, we increase X and decrease Y.
-				for x := origin.x; x <= destination.x; x++ {
-					for y := origin.y; y >= destination.y; y-- {
-						d.validateAndIncrease(origin, Point{x: x, y: y})
-					}
-				}
+				signX, signY = 1, -1
 			case 45:
 				// To move at a 45-degree angleInDegrees, we increase X and Y.
-				for x := origin.x; x <= destination.x; x++ {
-					for y := origin.y; y <= destination.y; y++ {
-						d.validateAndIncrease(origin, Point{x: x, y: y})
-					}
-				}
+				signX, signY = 1, 1
 			case 135:
 				// To move at a 135-degree angleInDegrees, we decrease X and increase Y.
-				for x := origin.x; x >= destination.x; x-- {
-					for y := origin.y; y <= destination.y; y++ {
-						d.validateAndIncrease(origin, Point{x: x, y: y})
-					}
-				}
+				signX, signY = -1, 1
 			case -135:
 				// To move at a -135-degree angleInDegrees, we decrease X and Y.
-				for x := origin.x; x >= destination.x; x-- {
-					for y := origin.y; y >= destination.y; y-- {
-						d.validateAndIncrease(origin, Point{x: x, y: y})
-					}
-				}
+				signX, signY = -1, -1
+			}
+			for i := 0; i <= distance; i++ {
+				d.grid[origin.x+(i*signX)][origin.y+(i*signY)]++
 			}
 		}
-	}
-}
-
-// validateAndIncrease will increase by 1 a target position in the diagram, if the X and Y distance between an origin
-// and the target are equal.  This guarantees they are at a 45-degree angle.
-func (d *Diagram) validateAndIncrease(origin Point, target Point) {
-	if math.Abs(float64(origin.x-target.x)) == math.Abs(float64(origin.y-target.y)) {
-		d.grid[target.x][target.y]++
 	}
 }
 
