@@ -53,8 +53,8 @@ func firstExercise() (result int, err error) {
 
 // decodeDigits will take an array with ten unique digits, break the code and return another slice of strings with ten
 // positions, where each position corresponds to its equivalent "secret" digits.
-// The solution is achieved by finding the intersection of characters composing the digit.  Since we know 4 out of the
-// 10 digits, we can find out the remaining ones by combining these intersections.
+// The solution is achieved by finding the subtraction of characters composing the digit.  Since we know 4 out of the
+// 10 digits, we can find out the remaining ones by combining these subtractions.
 func decodeDigits(uniqueDigits []string) []string {
 	dictionary := make([]string, 10)
 	segments := make([]string, 10) // We will use the position in the slice to determine segments 0->a, 1->b...9->g
@@ -85,20 +85,20 @@ func decodeDigits(uniqueDigits []string) []string {
 	}
 
 	// Now we can infer the other missing positions.
-	// First, we can find the top segment with the intersection between 1 and 7.
-	segments[0] = intersectSegments(dictionary[7], dictionary[1])
+	// First, we can find the top segment with the subtraction between 1 and 7.
+	segments[0] = subtractSegments(dictionary[7], dictionary[1])
 
 	// With this information we can find the 6-segment numbers.
 	for _, value := range sixDigitOnes {
-		findingNine := intersectSegments(intersectSegments(value, dictionary[4]), dictionary[7]) // (value ∩ 4) ∩ 7
-		findingSix := intersectSegments(dictionary[1], intersectSegments(dictionary[8], value))  // 1 ∩ (8 ∩ value)
+		findingNine := subtractSegments(subtractSegments(value, dictionary[4]), dictionary[7]) // (value - 4) - 7
+		findingSix := subtractSegments(dictionary[1], subtractSegments(dictionary[8], value))  // 1 - (8 - value)
 
 		if len(findingNine) == 1 {
-			// Only 9 satisfies the condition, len((9 ∩ 4) ∩ 7) == 1.
+			// Only 9 satisfies the condition, len((9 - 4) - 7) == 1.
 			segments[6] = findingNine
 			dictionary[9] = value
 		} else if len(findingSix) == 1 {
-			// Only six satisfy this condition, len(1 ∩ (8 ∩ 6)) == 1.
+			// Only six satisfy this condition, len(1 - (8 - 6)) == 1.
 			segments[2] = findingSix
 			dictionary[6] = value
 		} else {
@@ -107,14 +107,14 @@ func decodeDigits(uniqueDigits []string) []string {
 		}
 	}
 	// Since we know the number 6 and 1.
-	segments[5] = intersectSegments(dictionary[1], dictionary[6]) // 1 ∩ 6
+	segments[5] = subtractSegments(dictionary[1], dictionary[6]) // 1 - 6
 
 	// Now we will proceed to identify the digits formed by five segments.
 	for _, value := range fiveDigitOnes {
 		// Since we know all segments but one from three, it is easy to identify it.
-		findingThree := intersectSegments(value, segments[0]+segments[2]+segments[5]+segments[6])
+		findingThree := subtractSegments(value, segments[0]+segments[2]+segments[5]+segments[6])
 		// Now, the segments of 9 minus the segments of 5, should be just segment 2.
-		findingFive := intersectSegments(dictionary[9], value) // 9 ∩ value
+		findingFive := subtractSegments(dictionary[9], value) // 9 - value
 
 		if len(findingThree) == 1 {
 			segments[3] = findingThree
@@ -133,7 +133,7 @@ func decodeDigits(uniqueDigits []string) []string {
 // translation, returns another string with the number it represents.
 func translateDigit(digit string, dictionary []string) (string, error) {
 	for i, number := range dictionary {
-		if len(digit) == len(number) && len(intersectSegments(digit, number)) == 0 {
+		if len(digit) == len(number) && len(subtractSegments(digit, number)) == 0 {
 			return strconv.Itoa(i), nil
 		}
 	}
@@ -141,9 +141,9 @@ func translateDigit(digit string, dictionary []string) (string, error) {
 	return "", errors.New("unable to translate")
 }
 
-// intersectSegments will find the letters in source that are not present in toCompare, then return them in a single
+// subtractSegments will find the letters in source that are not present in toCompare, then return them in a single
 // string.
-func intersectSegments(source string, toCompare string) (result string) {
+func subtractSegments(source string, toCompare string) (result string) {
 	buffer := make(map[rune]bool)
 	for _, value := range toCompare {
 		buffer[value] = true
