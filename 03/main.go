@@ -158,13 +158,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		fmt.Printf("The firstResult of the first exercise is: %d.\n", firstResult)
+		fmt.Printf("The result of the first exercise is: %d.\n", firstResult)
 	}
 
 	secondResult, err := secondExercise()
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		fmt.Printf("The firstResult of the second exercise is: %d.\n", secondResult)
+		fmt.Printf("The result of the second exercise is: %d.\n", secondResult)
 	}
 }
