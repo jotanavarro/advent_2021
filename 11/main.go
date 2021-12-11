@@ -115,16 +115,6 @@ func triggerFlash(matrix *[][]Octopus) int {
 	}
 }
 
-func printBoard(matrix *[][]Octopus) {
-	for i := 0; i < len(*matrix); i++ {
-		for q := 0; q < len((*matrix)[i]); q++ {
-			fmt.Printf("%d ", (*matrix)[i][q].energy)
-		}
-		fmt.Printf("\n")
-	}
-	fmt.Printf("\n")
-}
-
 func firstExercise() (int, error) {
 	file, err := os.Open("inputs/day11_exercise01.txt")
 	if err != nil {
@@ -135,8 +125,6 @@ func firstExercise() (int, error) {
 	octopuses := loadInput(bufio.NewScanner(file))
 	steps := 100
 	flashes := 0
-
-	printBoard(&octopuses)
 
 	for i := 0; i < steps; i++ {
 		increaseEnergy(&octopuses)
@@ -160,7 +148,6 @@ func secondExercise() (int, error) {
 	for i := 1; i < math.MaxInt; i++ {
 		increaseEnergy(&octopuses)
 		if triggerFlash(&octopuses) == numberOfOctopuses {
-			printBoard(&octopuses)
 			return i, nil
 		}
 		restartFlashMemory(&octopuses)
